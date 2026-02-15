@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "WinUIApp1": {
+    "TaskbarAlternativeBlazor": {
       "commandName": "Project",
       "nativeDebugging": false
     }

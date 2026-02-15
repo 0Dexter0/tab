@@ -2,7 +2,7 @@
 
 //using VijayAnand.MauiBlazor.Markup;
 
-namespace WinUIApp1.Views;
+namespace TaskbarAlternativeBlazor.Views;
 
 public partial class MauiPage : ContentPage
 {

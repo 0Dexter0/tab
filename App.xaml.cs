@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml;
 using Frame = Microsoft.UI.Xaml.Controls.Frame;
 using Window = Microsoft.UI.Xaml.Window;
 
-namespace WinUIApp1;
+namespace TaskbarAlternativeBlazor;
 
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.

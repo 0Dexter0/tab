@@ -6,7 +6,7 @@ using Microsoft.Maui.LifecycleEvents;
 using Microsoft.UI.Windowing;
 #endif
 
-namespace WinUIApp1;
+namespace TaskbarAlternativeBlazor;
 
 public static partial class MauiProgram
 {

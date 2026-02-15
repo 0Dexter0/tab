@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace WinUIApp1;
+namespace TaskbarAlternativeBlazor;
 
 public partial class MyApp : Application
 {

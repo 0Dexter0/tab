@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Timer = System.Timers.Timer;
 
-namespace WinUIApp1.Pages;
+namespace TaskbarAlternativeBlazor.Pages;
 
-public partial class Home : ComponentBase, IDisposable
+public partial class Taskbar : ComponentBase, IDisposable
 {
     private DateTime _currentTime = DateTime.Now;
     private Timer? _timer;

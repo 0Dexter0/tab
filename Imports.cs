@@ -1,5 +1,5 @@
-global using WinUIApp1;
-global using WinUIApp1.Views;
+global using TaskbarAlternativeBlazor;
+global using TaskbarAlternativeBlazor.Views;
 
 // Static
 global using static Microsoft.Maui.Graphics.Colors;

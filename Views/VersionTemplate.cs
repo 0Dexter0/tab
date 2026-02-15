@@ -1,4 +1,4 @@
-namespace WinUIApp1.Views;
+namespace TaskbarAlternativeBlazor.Views;
 
 public partial class VersionTemplate : ContentView
 {

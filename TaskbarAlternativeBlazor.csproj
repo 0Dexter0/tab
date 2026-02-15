@@ -17,7 +17,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>WinUIApp1</RootNamespace>
+        <RootNamespace>TaskbarAlternativeBlazor</RootNamespace>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
         <EnableDefaultXamlItems>false</EnableDefaultXamlItems>
 

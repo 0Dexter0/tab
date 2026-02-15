@@ -1,6 +1,6 @@
 ﻿using Microsoft.Maui.Platform;
 
-namespace WinUIApp1.Views;
+namespace TaskbarAlternativeBlazor.Views;
 
 /// <summary>
 /// A simple page that can be used on its own or navigated to within a Frame.
