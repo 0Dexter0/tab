@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Timer = System.Timers.Timer;
+using TaskbarAlternativeBlazor.Taskbar;
+using TaskbarAlternativeBlazor.Taskbar.Services;
+using TaskbarAlternativeBlazor.Widgets.ClockWidget;
+using TaskbarAlternativeBlazor.Widgets.Common;
 
 namespace TaskbarAlternativeBlazor.Pages;
 
-public partial class Taskbar : ComponentBase, IDisposable
+public partial class Taskbar : ComponentBase
 {
-    private DateTime _currentTime = DateTime.Now;
-    private Timer? _timer;
+    private IWidget[] Widgets { get; set; } = null!;
 
     protected override void OnInitialized()
     {
-        _timer = new(500);
-        _timer.Elapsed += (s, e) =>
-        {
-            _currentTime = DateTime.Now;
-            InvokeAsync(StateHasChanged);
-        };
-        _timer.Start();
+        var config = new ConfigProvider().GetConfiguration();
+        var widgetProvider = new WidgetProvider([new ClockWidget { Name = "clock" }]);
+
+        var widgetNames = config.Bars[0].Widgets.Center;
+
+        Widgets = widgetNames.Select(widgetProvider.GetWidget).ToArray();
     }
 
     private static object? _shellInstance;
@@ -111,10 +112,5 @@ public partial class Taskbar : ComponentBase, IDisposable
             };
             process.Start();
         }
-    }
-
-    public void Dispose()
-    {
-        _timer?.Dispose();
     }
 }

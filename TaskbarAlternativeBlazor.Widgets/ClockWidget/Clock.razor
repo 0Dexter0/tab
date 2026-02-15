@@ -1,0 +1,5 @@
+@using System.Globalization
+@inherits TaskbarAlternativeBlazor.Widgets.Common.WidgetComponentBase<ClockWidgetSettings>
+
+@* <span class="clock">@((MarkupString)Date.ToString("HH:mm '<br/>' dd.mm.yyyy", CultureInfo.InvariantCulture))</span> *@
+<span class="clock">@((MarkupString)Date.ToString(Settings.Label, CultureInfo.InvariantCulture))</span>

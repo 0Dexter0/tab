@@ -57,4 +57,9 @@
       <Resource Remove="Views\MainPage.xaml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TaskbarAlternativeBlazor.Widgets.Common\TaskbarAlternativeBlazor.Widgets.Common.csproj" />
+      <ProjectReference Include="..\TaskbarAlternativeBlazor.Widgets\TaskbarAlternativeBlazor.Widgets.csproj" />
+    </ItemGroup>
+
 </Project>
