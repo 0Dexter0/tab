@@ -1,0 +1,41 @@
+﻿@page "/"
+
+<div class="taskbar-inner">
+    <div class="start-section">
+        <button class="taskbar-button start-button" title="Start" @onclick="OpenStartMenu">
+            <i class="fab fa-windows"></i>
+        </button>
+        <div class="search-box" @onclick="OpenSearch">
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+        </div>
+    </div>
+
+    <div class="apps-section">
+        <button class="taskbar-button active" title="File Explorer" @onclick='() => LaunchApp("explorer.exe")'>
+            <i class="fas fa-folder"></i>
+            <div class="active-indicator"></div>
+        </button>
+        <button class="taskbar-button" title="Edge" @onclick='() => LaunchApp("microsoft-edge:")'>
+            <i class="fab fa-edge"></i>
+        </button>
+        <button class="taskbar-button" title="Settings" @onclick='() => LaunchApp("ms-settings:")'>
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+
+    <div class="tray-section">
+        <div class="tray-icons">
+            <i class="fas fa-chevron-up" @onclick="ToggleTray" title="Show hidden icons"></i>
+            <i class="fas fa-wifi" @onclick='() => LaunchApp("ms-settings:network")' title="Network"></i>
+            <i class="fas fa-volume-up" @onclick='() => LaunchApp("ms-settings:apps-volume")' title="Volume"></i>
+            <i class="fas fa-battery-full" @onclick='() => LaunchApp("ms-settings:powersleep")' title="Battery"></i>
+        </div>
+        <div class="clock" @onclick='() => LaunchApp("outlookcal:")' title="Date and Time">
+            <div class="time">@_currentTime.ToString("h:mm tt")</div>
+            <div class="date">@_currentTime.ToString("M/d/yyyy")</div>
+        </div>
+        <div class="show-desktop" @onclick="ShowDesktop" title="Show Desktop"></div>
+    </div>
+</div>
+
