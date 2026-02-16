@@ -10,12 +10,13 @@ public partial class Taskbar : ComponentBase
 {
     private IWidget[] Widgets { get; set; } = null!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var config = new ConfigProvider().GetConfiguration();
+        ConfigProvider configProvider = new();
+        var config = await configProvider.GetConfigurationAsync();
         var widgetProvider = new WidgetProvider([new ClockWidget { Name = "clock" }]);
 
-        var widgetNames = config.Bars[0].Widgets.Center;
+        var widgetNames = config.Bars.Values.First().Widgets.Center;
 
         Widgets = widgetNames.Select(widgetProvider.GetWidget).ToArray();
     }
