@@ -2,30 +2,16 @@
 
 <div class="taskbar-inner">
     <div class="start-section">
-        <button class="taskbar-button start-button" title="Start" @onclick="OpenStartMenu">
-            <i class="fab fa-windows"></i>
-        </button>
-        <div class="search-box" @onclick="OpenSearch">
-            <i class="fas fa-search"></i>
-            <span>Search</span>
-        </div>
     </div>
 
     <div class="apps-section">
         @foreach (var widget in Widgets)
         {
-            <DynamicComponent Type="widget.RuntimeType" Parameters="widget.ComponentSettings" />
+            <DynamicComponent Type="widget.Component" Parameters="widget.ComponentSettings" />
         }
     </div>
 
     <div class="tray-section">
-        <div class="tray-icons">
-            <i class="fas fa-chevron-up" @onclick="ToggleTray" title="Show hidden icons"></i>
-            <i class="fas fa-wifi" @onclick='() => LaunchApp("ms-settings:network")' title="Network"></i>
-            <i class="fas fa-volume-up" @onclick='() => LaunchApp("ms-settings:apps-volume")' title="Volume"></i>
-            <i class="fas fa-battery-full" @onclick='() => LaunchApp("ms-settings:powersleep")' title="Battery"></i>
-        </div>
-        <div class="show-desktop" @onclick="ShowDesktop" title="Show Desktop"></div>
     </div>
 </div>
 

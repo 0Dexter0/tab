@@ -5,12 +5,7 @@ namespace TaskbarAlternativeBlazor.Widgets.Common;
 public abstract class WidgetDeserializerBase<TWidget>
     where TWidget : IWidget
 {
-    public abstract Task<bool> CanDeserialize(Stream stream);
+    public abstract bool CanDeserialize(string type);
 
-    public async Task<TWidget> DeserializeAsync(Stream stream)
-    {
-        using StreamReader reader = new(stream);
-
-        return new Deserializer().Deserialize<TWidget>(reader);
-    }
+    public IWidget Deserialize(StreamReader reader) => new Deserializer().Deserialize<TWidget>(reader);
 }

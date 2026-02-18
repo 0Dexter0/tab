@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Embedding;
 using Microsoft.Maui.LifecycleEvents;
+using TaskbarAlternativeBlazor.Taskbar;
+using TaskbarAlternativeBlazor.Taskbar.Services;
 
 #if WINDOWS
 using Microsoft.UI.Windowing;
@@ -22,6 +24,11 @@ public static partial class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddSingleton(AppInfo.Current);
+
+        builder.Services.AddSingleton<ConfigProvider>();
+        builder.Services.AddSingleton<WidgetSettingsWatchService>();
+        builder.Services.AddSingleton<MainConfigWatchService>();
+        builder.Services.AddTransient<IWidgetProvider, WidgetProvider>();
 
 #if DEBUG
 

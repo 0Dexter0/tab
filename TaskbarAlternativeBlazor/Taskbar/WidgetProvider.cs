@@ -2,14 +2,31 @@ using TaskbarAlternativeBlazor.Widgets.Common;
 
 namespace TaskbarAlternativeBlazor.Taskbar;
 
-internal sealed class WidgetProvider
+internal sealed class WidgetProvider : IWidgetProvider
 {
-    private readonly IWidget[] _widgets;
+    private readonly string _widgetsFolder = Path.Combine(AppContext.BaseDirectory, "Widgets");
 
-    public WidgetProvider(IEnumerable<IWidget> widgets)
+    private readonly IWidgetDeserializer[] _deserializers;
+
+    public WidgetProvider(IEnumerable<IWidgetDeserializer> deserializers)
     {
-        _widgets = widgets.ToArray();
+        _deserializers = deserializers.ToArray();
     }
 
-    public IWidget GetWidget(string type) => _widgets.Single(x => x.Type == type);
+    public IWidget? Get(string name)
+    {
+        Directory.CreateDirectory(_widgetsFolder);
+
+        string widgetFile = Path.Combine(_widgetsFolder, $"{name}.yaml");
+        if (!File.Exists(widgetFile))
+        {
+            return null;
+        }
+
+        using StreamReader reader = new(File.OpenRead(widgetFile));
+
+        string type = reader.ReadLine() ?? string.Empty;
+
+        return _deserializers.Single(x => x.CanDeserialize(type)).Deserialize(reader);
+    }
 }

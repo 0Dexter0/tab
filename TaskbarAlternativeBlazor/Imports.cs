@@ -2,7 +2,7 @@ global using TaskbarAlternativeBlazor;
 global using TaskbarAlternativeBlazor.Views;
 
 // Static
-global using static Microsoft.Maui.Graphics.Colors;
+// global using static Microsoft.Maui.Graphics.Colors;
 
 // Implicit Namespace option
 // To enable, uncomment the line below.

@@ -1,117 +1,69 @@
 ﻿using Microsoft.AspNetCore.Components;
 using TaskbarAlternativeBlazor.Taskbar;
 using TaskbarAlternativeBlazor.Taskbar.Services;
-using TaskbarAlternativeBlazor.Widgets.ClockWidget;
 using TaskbarAlternativeBlazor.Widgets.Common;
 
 namespace TaskbarAlternativeBlazor.Pages;
 
-public partial class Taskbar : ComponentBase
+public partial class Taskbar : ComponentBase, IDisposable
 {
+    [Inject]
+    private IWidgetProvider WidgetProvider { get; init; } = null!;
+
+    [Inject]
+    private ConfigProvider ConfigProvider { get; init; } = null!;
+
+    [Inject]
+    private WidgetSettingsWatchService WidgetSettingsWatchService { get; init; } = null!;
+
     private IWidget[] Widgets { get; set; } = null!;
+
+    private HashSet<string> _activeWidgetFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    public void Dispose()
+    {
+        WidgetSettingsWatchService.WidgetConfigChanged -= OnWidgetConfigChanged;
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        ConfigProvider configProvider = new();
-        var config = await configProvider.GetConfigurationAsync();
-        var widgetProvider = new WidgetProvider([new ClockWidget { Name = "clock" }]);
+        WidgetSettingsWatchService.WidgetConfigChanged += OnWidgetConfigChanged;
+        WidgetSettingsWatchService.Start();
 
-        var widgetNames = config.Bars.Values.First().Widgets.Center;
+        var config = await ConfigProvider.GetConfigurationAsync();
 
-        Widgets = widgetNames.Select(widgetProvider.GetWidget).ToArray();
+        var bar = config.Bars.First();
+
+        var widgetFiles = bar.Widgets.Left
+            .Concat(bar.Widgets.Center)
+            .Concat(bar.Widgets.Right)
+            .ToArray();
+
+        _activeWidgetFiles = widgetFiles.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        Widgets = _activeWidgetFiles.Select(WidgetProvider.Get).Where(x => x is not null).ToArray()!;
     }
 
-    private static object? _shellInstance;
-    private static Type? _shellType;
-
-    private void LaunchApp(string uriOrCommand)
+    private void OnWidgetConfigChanged(string changedFileName)
     {
-        // Offload to background thread to keep UI responsive
-        Task.Run(() =>
+        if (!_activeWidgetFiles.Contains(changedFileName))
         {
-            try
-            {
-                using (var process = new System.Diagnostics.Process())
-                {
-                    process.StartInfo = new(uriOrCommand)
-                    {
-                        UseShellExecute = true,
-                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
-                    };
-                    process.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Fallback for MAUI schemes if direct process start fails
-                MainThread.BeginInvokeOnMainThread(async void () => {
-                    try
-                    {
-                        await Launcher.Default.OpenAsync(new Uri(uriOrCommand));
-                    }
-                    catch
-                    {
-                        Console.WriteLine($"Error launching app: {ex.Message}");
-                    }
-                });
-            }
-        });
-    }
-
-    private void OpenStartMenu()
-    {
-        // Direct explorer call for Start Menu
-        _ = Task.Run(() => ShellExecute("explorer.exe", "shell:::{2559a1f8-21d7-11d4-bdaf-00c04f60b9f0}"));
-    }
-
-    private void OpenSearch()
-    {
-        LaunchApp("search-ms:");
-    }
-
-    private void ToggleTray()
-    {
-        // Mock toggle
-    }
-
-    private void ShowDesktop()
-    {
-        _ = Task.Run(() =>
-        {
-            try
-            {
-                if (_shellType == null)
-                {
-                    _shellType = Type.GetTypeFromProgID("Shell.Application");
-                }
-
-                if (_shellType != null)
-                {
-                    _shellInstance ??= Activator.CreateInstance(_shellType);
-
-                    if (_shellInstance != null)
-                    {
-                        _shellType.InvokeMember("MinimizeAll", System.Reflection.BindingFlags.InvokeMethod, null, _shellInstance, null);
-                    }
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-        });
-    }
-
-    private void ShellExecute(string file, string args)
-    {
-        using (var process = new System.Diagnostics.Process())
-        {
-            process.StartInfo = new(file, args)
-            {
-                UseShellExecute = true,
-                WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
-            };
-            process.Start();
+            return;
         }
+
+        _ = InvokeAsync(() =>
+        {
+            for (var i = 0; i < Widgets.Length; i++)
+            {
+                if (string.Equals(Widgets[i].Name,
+                    Path.GetFileNameWithoutExtension(changedFileName),
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    Widgets[i] = WidgetProvider.Get(changedFileName)!;
+                    StateHasChanged();
+                    return;
+                }
+            }
+        });
     }
 }

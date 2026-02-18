@@ -5,50 +5,44 @@ namespace TaskbarAlternativeBlazor.Taskbar.Services;
 
 internal sealed class ConfigProvider
 {
-    private readonly Configuration _default = new(
-    false,
-    false,
-    new()
-    {
-        ["default"] = new(
-        true,
-        [],
-        "bottom",
-        "100%",
-        "47",
-        new([], [], []))
-    });
-    
-    // public Configuration GetConfiguration() => new(
-    //     false,
-    //     false,
-    //     [
-    //     new(
-    //         true,
-    //         [],
-    //         "",
-    //         "",
-    //         "",
-    //         new([], ["tab.clock"], []))
-    //     ]);
+    private static readonly string ConfigFilePath = Path.Combine(AppContext.BaseDirectory, "config.yaml");
+
+    private readonly Configuration _default = new()
+            {
+                WatchStyles = false,
+                WatchConfig =  false,
+                Bars = [
+                    new()
+                    {
+                        Enabled = true,
+                        Name = "default",
+                        Height = "47",
+                        Width = "100%",
+                        Position = "bottom",
+                        Screens = [],
+                        Widgets = new()
+                        {
+                            Left = [],
+                            Center = ["clock"],
+                            Right = []
+                        }
+                    }]
+            };
 
     public async Task<Configuration> GetConfigurationAsync()
     {
-        var configFilePath = Path.Combine(AppContext.BaseDirectory, "config.yaml");
+        await EnsureExistsAsync();
+        return Load();
+    }
 
-        if (!File.Exists(configFilePath))
-        {
-            var stream = File.Create(configFilePath);
+    private Task EnsureExistsAsync() =>
+        File.Exists(ConfigFilePath)
+            ? Task.CompletedTask
+            : File.WriteAllTextAsync(ConfigFilePath, new Serializer().Serialize(_default));
 
-            using StreamWriter writer = new(stream);
-            await writer.WriteAsync(new Serializer().Serialize(_default));
-
-            return _default;
-        }
-
-        var configStream = File.OpenRead(configFilePath);
-        using StreamReader reader = new(configStream);
-
+    private Configuration Load()
+    {
+        using var reader = File.OpenText(ConfigFilePath);
         return new Deserializer().Deserialize<Configuration>(reader);
     }
 }
