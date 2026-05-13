@@ -18,7 +18,7 @@ internal sealed class MainConfigWatchService : IDisposable
     private string _lastNativeFingerprint = "";
     private string _lastWebFingerprint = "";
 
-    public event Action<Taskbar.Config.Widgets[]>? WebConfigChanged;
+    public event Action<Taskbar.Config.BarWidgets[]>? WebConfigChanged;
 
     public MainConfigWatchService(ConfigProvider configProvider)
     {
@@ -61,7 +61,9 @@ internal sealed class MainConfigWatchService : IDisposable
                 var webChanged = webFp != _lastWebFingerprint;
 
                 if (!nativeChanged && !webChanged)
+                {
                     return;
+                }
 
                 _lastNativeFingerprint = nativeFp;
                 _lastWebFingerprint = webFp;
@@ -83,7 +85,8 @@ internal sealed class MainConfigWatchService : IDisposable
     private static string ComputeWebFingerprint(Configuration cfg) =>
         Sha256(cfg.Bars.Select(x => x.Widgets).ToString()!);
 
-    private static string Sha256(string input) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input)));
+    private static string Sha256(string input) =>
+        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(input)));
 
     private static void RestartCurrentProcess()
     {

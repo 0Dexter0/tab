@@ -1,7 +1,10 @@
+using YamlDotNet.Serialization;
+
 namespace TaskbarAlternativeBlazor.Widgets.Common;
 
 public interface IWidget
 {
+    [YamlIgnore]
     string Name { get; }
 
     Type Component { get; }

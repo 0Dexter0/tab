@@ -3,7 +3,7 @@ using YamlDotNet.Serialization;
 
 namespace TaskbarAlternativeBlazor.Taskbar.Services;
 
-internal sealed class ConfigProvider
+public sealed class ConfigProvider
 {
     private static readonly string ConfigFilePath = Path.Combine(AppContext.BaseDirectory, "config.yaml");
 
@@ -19,6 +19,7 @@ internal sealed class ConfigProvider
                         Height = "47",
                         Width = "100%",
                         Position = "bottom",
+                        Centered = true,
                         Screens = [],
                         Widgets = new()
                         {

@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml;
+using TaskbarAlternativeBlazor.Taskbar.Services;
 using Frame = Microsoft.UI.Xaml.Controls.Frame;
 using Window = Microsoft.UI.Xaml.Window;
 
@@ -10,11 +11,13 @@ namespace TaskbarAlternativeBlazor;
 /// </summary>
 public partial class App
 {
-    private const int TaskbarHeight = 60;
+    private readonly ConfigProvider _configProvider;
 
     private Window? _window;
     private Microsoft.UI.Windowing.AppWindow? _appWindow;
     private nint _windowHandle;
+
+    private const int DefaultHeight = 47;
 
     // Win32 style indices
     private const int GwlStyle = -16;
@@ -40,12 +43,7 @@ public partial class App
 
     // DWM attributes
     private const int DwmwaWindowCornerPreference = 33;
-
-    // DWM corner preferences
-    private const int DwmwcpDefault = 0;
     private const int DwmwcpDonotround = 1;
-    private const int DwmwcpRound = 2;
-    private const int DwmwcpRoundsmall = 3;
 
     /// <summary>
     /// Initializes the singleton application object. This is the first line of authored code
@@ -53,6 +51,7 @@ public partial class App
     /// </summary>
     public App()
     {
+        _configProvider = new();
         InitializeComponent();
     }
 
@@ -90,6 +89,7 @@ public partial class App
             return;
         }
 
+        var barConfig = _configProvider.GetConfigurationAsync().GetAwaiter().GetResult().Bars.First();
         _appWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Overlapped);
         if (_appWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter p)
         {
@@ -101,18 +101,34 @@ public partial class App
         }
 
         var displayArea = Microsoft.UI.Windowing.DisplayArea.Primary;
-        int width = displayArea.OuterBounds.Width;
-        int height = TaskbarHeight;
+        int fullWidth = displayArea.OuterBounds.Width;
+
+        if (!int.TryParse(barConfig.Width[..^1], out int value))
+        {
+            return;
+        }
+
+        value -= 10;
+        double k = value / 100D;
+        int width = (int)(fullWidth * k);
+
+        int height = int.TryParse(barConfig.Height, out var result) ? result : DefaultHeight;
         int x = displayArea.OuterBounds.X;
+
+        if (barConfig.Centered)
+        {
+            x = (fullWidth - width) / 2;
+        }
+
         int y = displayArea.OuterBounds.Y + displayArea.OuterBounds.Height - height;
 
         _appWindow.MoveAndResize(new(x, y, width, height));
+
+        ApplyRoundedRegion(_windowHandle, 18);
     }
 
     private static void ApplyBorderlessSquareWindow(nint hwnd)
     {
-        if (hwnd == 0) return;
-
         RemoveWin32Borders(hwnd);
         SetCornerPreference(hwnd, DwmwcpDonotround);
     }
@@ -134,8 +150,8 @@ public partial class App
         xs &= ~WsExStaticedge;
         xs &= ~WsExDlgmodalframe;
 
-        SetWindowLongPtr(hwnd, GwlStyle, new nint(s));
-        SetWindowLongPtr(hwnd, GwlExstyle, new nint(xs));
+        SetWindowLongPtr(hwnd, GwlStyle, new(s));
+        SetWindowLongPtr(hwnd, GwlExstyle, new(xs));
 
         SetWindowPos(
             hwnd,
@@ -147,6 +163,19 @@ public partial class App
     private static void SetCornerPreference(nint hwnd, int preference)
     {
         _ = DwmSetWindowAttribute(hwnd, DwmwaWindowCornerPreference, ref preference, sizeof(int));
+    }
+
+    private static void ApplyRoundedRegion(nint hwnd, int radiusPx)
+    {
+        GetWindowRect(hwnd, out var rc);
+
+        int width = rc.Right - rc.Left;
+        int height = rc.Bottom - rc.Top;
+
+        int diameter = Math.Max(0, radiusPx * 2);
+        nint hrgn = CreateRoundRectRgn(0, 0, width + 1, height + 1, diameter, diameter);
+
+        SetWindowRgn(hwnd, hrgn, true);
     }
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
@@ -165,6 +194,30 @@ public partial class App
         int cy,
         uint uFlags);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern int SetWindowRgn(nint hWnd, nint hRgn, bool bRedraw);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool GetWindowRect(nint hWnd, out Rect lpRect);
+
+    [DllImport("gdi32.dll", SetLastError = true)]
+    private static extern nint CreateRoundRectRgn(
+        int nLeftRect,
+        int nTopRect,
+        int nRightRect,
+        int nBottomRect,
+        int nWidthEllipse,
+        int nHeightEllipse);
+
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(nint hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Rect
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
 }

@@ -1,6 +1,6 @@
 namespace TaskbarAlternativeBlazor.Taskbar.Config;
 
-internal record Widgets
+public record BarWidgets
 {
     public string[] Left { get; init; }
 
