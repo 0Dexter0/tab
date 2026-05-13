@@ -20,30 +20,30 @@ public partial class App
     private const int DefaultHeight = 47;
 
     // Win32 style indices
-    private const int GwlStyle = -16;
-    private const int GwlExstyle = -20;
+    private const int GwlStyle = -16; // Index to retrieve/set window styles
+    private const int GwlExstyle = -20; // Index to retrieve/set extended window styles
 
     // Win32 styles
-    private const long WsCaption = 0x00C00000L;
-    private const long WsThickframe = 0x00040000L;
-    private const long WsBorder = 0x00800000L;
-    private const long WsDlgframe = 0x00400000L;
+    private const long WsCaption = 0x00C00000L; // Title bar and border
+    private const long WsThickframe = 0x00040000L; // Sizing border
+    private const long WsBorder = 0x00800000L; // Thin line border
+    private const long WsDlgframe = 0x00400000L; // Dialog box border style
 
     // Win32 extended styles
-    private const long WsExClientedge = 0x00000200L;
-    private const long WsExStaticedge = 0x00020000L;
-    private const long WsExDlgmodalframe = 0x00000001L;
+    private const long WsExClientedge = 0x00000200L; // Sunken edge border
+    private const long WsExStaticedge = 0x00020000L; // Three-dimensional border style
+    private const long WsExDlgmodalframe = 0x00000001L; // Double border style
 
     // SetWindowPos flags
-    private const uint SwpNosize = 0x0001;
-    private const uint SwpNomove = 0x0002;
-    private const uint SwpNozorder = 0x0004;
-    private const uint SwpNoactivate = 0x0010;
-    private const uint SwpFramechanged = 0x0020;
+    private const uint SwpNosize = 0x0001; // Retains current size
+    private const uint SwpNomove = 0x0002; // Retains current position
+    private const uint SwpNozorder = 0x0004; // Retains current Z order
+    private const uint SwpNoactivate = 0x0010; // Does not activate the window
+    private const uint SwpFramechanged = 0x0020; // Forces a frame recalculation
 
     // DWM attributes
-    private const int DwmwaWindowCornerPreference = 33;
-    private const int DwmwcpDonotround = 1;
+    private const int DwmwaWindowCornerPreference = 33; // Corner rounding policy attribute
+    private const int DwmwcpDonotround = 1; // Explicitly prevent window rounding
 
     /// <summary>
     /// Initializes the singleton application object. This is the first line of authored code
@@ -135,21 +135,25 @@ public partial class App
 
     private static void RemoveWin32Borders(nint hwnd)
     {
+        // Retrieve the current window styles and extended styles
         nint style = GetWindowLongPtr(hwnd, GwlStyle);
         nint exStyle = GetWindowLongPtr(hwnd, GwlExstyle);
 
         long s = style.ToInt64();
         long xs = exStyle.ToInt64();
 
+        // Strip out standard window chrome (title bar, resizing handles, and frames)
         s &= ~WsCaption;
         s &= ~WsThickframe;
         s &= ~WsBorder;
         s &= ~WsDlgframe;
 
+        // Strip out extended 3D and client area borders
         xs &= ~WsExClientedge;
         xs &= ~WsExStaticedge;
         xs &= ~WsExDlgmodalframe;
 
+        // Apply the modified bitmasks back to the window
         SetWindowLongPtr(hwnd, GwlStyle, new(s));
         SetWindowLongPtr(hwnd, GwlExstyle, new(xs));
 

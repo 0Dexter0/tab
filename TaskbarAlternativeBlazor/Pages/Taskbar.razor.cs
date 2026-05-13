@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using TaskbarAlternativeBlazor.Taskbar;
 using TaskbarAlternativeBlazor.Taskbar.Services;
+using TaskbarAlternativeBlazor.Widgets.ClockWidget;
 using TaskbarAlternativeBlazor.Widgets.Common;
 
 namespace TaskbarAlternativeBlazor.Pages;
@@ -27,8 +28,8 @@ public partial class Taskbar : ComponentBase, IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        WidgetSettingsWatchService.WidgetConfigChanged += OnWidgetConfigChanged;
-        WidgetSettingsWatchService.Start();
+        // WidgetSettingsWatchService.WidgetConfigChanged += OnWidgetConfigChanged;
+        // WidgetSettingsWatchService.Start();
 
         var config = await ConfigProvider.GetConfigurationAsync();
 
@@ -41,7 +42,8 @@ public partial class Taskbar : ComponentBase, IDisposable
 
         _activeWidgetFiles = widgetFiles.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        Widgets = _activeWidgetFiles.Select(WidgetProvider.Get).Where(x => x is not null).ToArray()!;
+        // Widgets = _activeWidgetFiles.Select(WidgetProvider.Get).Where(x => x is not null).ToArray()!;
+        Widgets = [new ClockWidget { Name = "Clock", Settings = ClockWidgetSettings.Default }];
     }
 
     private void OnWidgetConfigChanged(string changedFileName)
