@@ -1,6 +1,6 @@
 ﻿@page "/"
-@using TaskbarAlternativeBlazor.Widgets.ClockWidget
-
+@using TaskbarAlternativeBlazor.Widgets
+@inject IRestartService RestartService
 <div class="taskbar-inner">
     <div class="start-section">
     </div>
@@ -13,6 +13,7 @@
     </div>
 
     <div class="tray-section">
+        <button class="btn btn-link" @onclick="() => RestartService.Restart()">RESTART</button>
     </div>
 </div>
 

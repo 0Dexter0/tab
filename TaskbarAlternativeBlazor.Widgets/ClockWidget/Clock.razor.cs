@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using TaskbarAlternativeBlazor.Widgets.Common;
 
 namespace TaskbarAlternativeBlazor.Widgets.ClockWidget;
@@ -7,6 +8,9 @@ public partial class Clock : WidgetComponentBase<ClockWidgetSettings>, IDisposab
     private Timer? _timer;
 
     private DateTime Date { get; set; }
+
+    [Inject]
+    public required IRestartService RestartService { get; init; }
 
     protected override void OnInitialized()
     {

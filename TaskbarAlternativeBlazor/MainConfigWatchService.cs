@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using TaskbarAlternativeBlazor.Native;
 using TaskbarAlternativeBlazor.Taskbar.Config;
 using TaskbarAlternativeBlazor.Taskbar.Services;
 
@@ -70,7 +71,8 @@ internal sealed class MainConfigWatchService : IDisposable
 
                 if (nativeChanged)
                 {
-                    RestartCurrentProcess();
+                    // RestartCurrentProcess();
+                    Kernel32.RestartProcess();
                     return;
                 }
 
